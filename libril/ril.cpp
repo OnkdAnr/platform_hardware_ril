@@ -27,7 +27,7 @@
 #include <utils/Log.h>
 #include <utils/SystemClock.h>
 #include <pthread.h>
-#include <binder/Parcel.h>
+#include <utils/Parcel.h>
 #include <cutils/jstring.h>
 
 #include <sys/types.h>
@@ -1184,7 +1184,7 @@ sendResponseRaw (const void *data, size_t dataSize) {
         return ret;
     }
 
-    blockingWrite(fd, data, dataSize);
+    ret = blockingWrite(fd, data, dataSize);
 
     if (ret < 0) {
         return ret;
