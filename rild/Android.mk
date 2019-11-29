@@ -11,10 +11,6 @@ LOCAL_SHARED_LIBRARIES := \
 	libcutils \
 	libril
 
-ifeq ($(TARGET_ARCH),arm)
-LOCAL_SHARED_LIBRARIES += libdl
-endif # arm
-
 LOCAL_CFLAGS := -DRIL_SHLIB
 
 LOCAL_MODULE:= rild
