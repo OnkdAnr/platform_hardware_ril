@@ -998,6 +998,15 @@ typedef struct {
  *              3 - Registration denied
  *              4 - Unknown
  *              5 - Registered, roaming
+ *             10 - Same as 0, but indicates that emergency calls
+ *                  are enabled.
+ *             12 - Same as 2, but indicates that emergency calls
+ *                  are enabled.
+ *             13 - Same as 3, but indicates that emergency calls
+ *                  are enabled.
+ *             14 - Same as 4, but indicates that emergency calls
+ *                  are enabled.
+ *
  * ((const char **)response)[1] is LAC if registered on a GSM/WCDMA system or
  *                              NULL if not.Valid LAC are 0x0000 - 0xffff
  * ((const char **)response)[2] is CID if registered on a * GSM/WCDMA or
@@ -3305,6 +3314,17 @@ typedef struct {
  */
 #define RIL_UNSOL_RINGBACK_TONE 1029
 
+/**
+ * RIL_UNSOL_RESEND_INCALL_MUTE
+ *
+ * Indicates that framework/application need reset the uplink mute state.
+ *
+ * There may be situations where the mute state becomes out of sync
+ * between the application and device in some GSM infrastructures.
+ *
+ * "data" is null
+ */
+#define RIL_UNSOL_RESEND_INCALL_MUTE 1030
 /***********************************************************************/
 
 
