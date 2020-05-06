@@ -67,9 +67,7 @@ typedef enum {
     RIL_E_SUBSCRIPTION_NOT_AVAILABLE = 12,      /* fail to find CDMA subscription from specified
                                                    location */
     RIL_E_MODE_NOT_SUPPORTED = 13,              /* HW does not support preferred network type */
-    RIL_E_FDN_CHECK_FAILURE = 14,               /* command failed because recipient is not on FDN list */
-    RIL_E_ILLEGAL_SIM_OR_ME = 15                /* network selection failed due to
-                                                   illegal SIM or ME */
+    RIL_E_FDN_CHECK_FAILURE = 14                /* command failed because recipient is not on FDN list */
 } RIL_Errno;
 
 typedef enum {
@@ -258,6 +256,7 @@ typedef struct {
 
 /* See RIL_REQUEST_LAST_CALL_FAIL_CAUSE */
 typedef enum {
+    CALL_FAIL_UNOBTAINABLE_NUMBER = 1,
     CALL_FAIL_NORMAL = 16,
     CALL_FAIL_BUSY = 17,
     CALL_FAIL_CONGESTION = 34,
@@ -1726,13 +1725,7 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  ILLEGAL_SIM_OR_ME
  *  GENERIC_FAILURE
- *
- * Note: Returns ILLEGAL_SIM_OR_ME when the failure is permanent and
- *       no retries needed, such as illegal SIM or ME.
- *       Returns GENERIC_FAILURE for all other causes that might be
- *       fixed by retries.
  *
  */
 #define RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC 46
@@ -1751,13 +1744,7 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  ILLEGAL_SIM_OR_ME
  *  GENERIC_FAILURE
- *
- * Note: Returns ILLEGAL_SIM_OR_ME when the failure is permanent and
- *       no retries needed, such as illegal SIM or ME.
- *       Returns GENERIC_FAILURE for all other causes that might be
- *       fixed by retries.
  *
  */
 #define RIL_REQUEST_SET_NETWORK_SELECTION_MANUAL 47
