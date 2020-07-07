@@ -67,9 +67,7 @@ typedef enum {
     RIL_E_SUBSCRIPTION_NOT_AVAILABLE = 12,      /* fail to find CDMA subscription from specified
                                                    location */
     RIL_E_MODE_NOT_SUPPORTED = 13,              /* HW does not support preferred network type */
-    RIL_E_FDN_CHECK_FAILURE = 14,               /* command failed because recipient is not on FDN list */
-    RIL_E_ILLEGAL_SIM_OR_ME = 15                /* network selection failed due to
-                                                   illegal SIM or ME */
+    RIL_E_FDN_CHECK_FAILURE = 14                /* command failed because recipient is not on FDN list */
 } RIL_Errno;
 
 typedef enum {
@@ -1728,13 +1726,7 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  ILLEGAL_SIM_OR_ME
  *  GENERIC_FAILURE
- *
- * Note: Returns ILLEGAL_SIM_OR_ME when the failure is permanent and
- *       no retries needed, such as illegal SIM or ME.
- *       Returns GENERIC_FAILURE for all other causes that might be
- *       fixed by retries.
  *
  */
 #define RIL_REQUEST_SET_NETWORK_SELECTION_AUTOMATIC 46
@@ -1753,13 +1745,7 @@ typedef struct {
  * Valid errors:
  *  SUCCESS
  *  RADIO_NOT_AVAILABLE
- *  ILLEGAL_SIM_OR_ME
  *  GENERIC_FAILURE
- *
- * Note: Returns ILLEGAL_SIM_OR_ME when the failure is permanent and
- *       no retries needed, such as illegal SIM or ME.
- *       Returns GENERIC_FAILURE for all other causes that might be
- *       fixed by retries.
  *
  */
 #define RIL_REQUEST_SET_NETWORK_SELECTION_MANUAL 47
@@ -3478,8 +3464,14 @@ struct RIL_Env {
      * soon as possible
      */
 
-    void (*RequestTimedCallback) (RIL_TimedCallback callback,
+    void* (*RequestTimedCallback) (RIL_TimedCallback callback,
                                    void *param, const struct timeval *relativeTime);
+
+
+    /**
+     * Remove user-specified callback function
+     */
+    void (*RemoveTimedCallback) (void *callbackInfo);
 };
 
 
@@ -3543,8 +3535,15 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
  * @param relativeTime a relative time value at which the callback is invoked
  */
 
-void RIL_requestTimedCallback (RIL_TimedCallback callback,
-                               void *param, const struct timeval *relativeTime);
+void* RIL_requestTimedCallback (RIL_TimedCallback callback,
+                                void *param, const struct timeval *relativeTime);
+
+/**
+ * Remove user-specified callback function
+ *  @param callbackInfo  Pointer returned to the caller when timer was scheduled
+ */
+
+void RIL_removeTimedCallback(void *callbackInfo);
 
 
 #endif /* RIL_SHLIB */
