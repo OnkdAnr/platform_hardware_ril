@@ -1109,6 +1109,10 @@ typedef struct {
  *                                 8 - No Suitable Cells in this Location Area
  *                                 9 - Network failure
  *                                10 - Persistent location update reject
+ * ((const char **)response)[14] is the Primary Scrambling Code of the current
+ *                               cell as described in TS 25.331, in hexadecimal
+ *                               format, or NULL if unknown or not registered
+ *                               to a UMTS network.
  *
  * Please note that registration state 4 ("unknown") is treated
  * as "out of service" in the Android telephony system
@@ -2959,7 +2963,6 @@ typedef struct {
  */
 #define RIL_REQUEST_REPORT_STK_SERVICE_IS_RUNNING 103
 
-
 /***********************************************************************/
 
 
@@ -3478,14 +3481,8 @@ struct RIL_Env {
      * soon as possible
      */
 
-    void* (*RequestTimedCallback) (RIL_TimedCallback callback,
+    void (*RequestTimedCallback) (RIL_TimedCallback callback,
                                    void *param, const struct timeval *relativeTime);
-
-
-    /**
-     * Remove user-specified callback function
-     */
-    void (*RemoveTimedCallback) (void *callbackInfo);
 };
 
 
@@ -3549,15 +3546,8 @@ void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
  * @param relativeTime a relative time value at which the callback is invoked
  */
 
-void* RIL_requestTimedCallback (RIL_TimedCallback callback,
-                                void *param, const struct timeval *relativeTime);
-
-/**
- * Remove user-specified callback function
- *  @param callbackInfo  Pointer returned to the caller when timer was scheduled
- */
-
-void RIL_removeTimedCallback(void *callbackInfo);
+void RIL_requestTimedCallback (RIL_TimedCallback callback,
+                               void *param, const struct timeval *relativeTime);
 
 
 #endif /* RIL_SHLIB */
