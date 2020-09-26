@@ -25,36 +25,12 @@ function Icc() {
     var IMEI = '123456789012345';
     var IMEISV = '00';
 
-    function RilAppStatus(type, state, persoState, aidPtr, appLabelPtr, pin1R, curPin1, curPin2) {
-        this.appType = type;
-        this.appState = state;
-        this.persoSubstate = persoState;
-        this.aid = aidPtr;
-        this.appLabel = appLabelPtr;
-        this.pin1Replaced = pin1R;
-        this.pin1 = curPin1;
-        this.pint2 = curPin2;
-    }
-
     function RilCardStatus() {
-        this.cardState = CARDSTATE_PRESENT;
-        this.universalPinState = PINSTATE_UNKNOWN;
+        this.cardState = 0;
+        this.universalPinState = 0;
         this.gsmUmtsSubscriptionAppIndex = 0;
-        this.cdmaSubscriptionAppIndex = CARD_MAX_APPS;
-        this.numApplications = 1;
-        this.applications = new Array(CARD_MAX_APPS);
-
-        // Initialize application status
-        for (i = 0; i < CARD_MAX_APPS; i++) {
-            var app = new RilAppStatus(APPTYPE_UNKNOWN, APPSTATE_UNKNOWN, PERSOSUBSTATE_UNKNOWN,
-                                       null, null, 0, PINSTATE_UNKNOWN, PINSTATE_UNKNOWN);
-            this.applications[i] = app;
-        }
-
-        // set gsm application status.
-        var gsmApp = new RilAppStatus(APPTYPE_SIM, APPSTATE_READY, PERSOSUBSTATE_READY, null, null,
-                                     0, PINSTATE_UNKNOWN, PINSTATE_UNKNOWN);
-        this.applications[this.gsmUmtsSubscriptionAppIndex] = gsmApp;
+        this.cdmaSubscriptionAppIndex = 0;
+        this.numApplications = 0;
     }
 
     var cardStatus = new RilCardStatus();
@@ -67,7 +43,6 @@ function Icc() {
 
         var rsp = new Object();
         rsp.cardStatus = cardStatus;
-
         result.responseProtobuf = rilSchema[packageNameAndSeperator +
                                  'RspGetSimStatus'].serialize(rsp);
         return result;
@@ -141,7 +116,7 @@ function Icc() {
             result.responseProtobuf = emptyProtobuf;
 
             try {
-                result = (this.simDispatchTable[req.reqNum]).call(this, req);
+                result = simDispatchTable[req.reqNum](req);
             } catch (err) {
                 print('Icc: Unknown reqNum=' + req.reqNum);
                 result.rilErrCode = RIL_E_REQUEST_NOT_SUPPORTED;
