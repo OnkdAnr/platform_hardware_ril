@@ -1203,7 +1203,6 @@ static void dispatchDataCall(Parcel& p, RequestInfo *pRI) {
       p2.setDataPosition(pos);
       dispatchStrings(p2, pRI);
     } else {
-      p.setDataPosition(pos);
       dispatchStrings(p, pRI);
     }
 }
@@ -2555,15 +2554,14 @@ RIL_register (const RIL_RadioFunctions *callbacks) {
     int flags;
 
     if (callbacks == NULL || ((callbacks->version != RIL_VERSION)
-                && (callbacks->version < 2))) { // Remove when partners upgrade to version 3
+                && (callbacks->version != 2))) { // Remove when partners upgrade to version 3
         LOGE(
             "RIL_register: RIL_RadioFunctions * null or invalid version"
             " (expected %d)", RIL_VERSION);
         return;
     }
-    if (callbacks->version < RIL_VERSION) {
-        LOGE ("RIL_register: upgrade RIL to version %d current version=%d",
-              RIL_VERSION, callbacks->version);
+    if (callbacks->version < 3) {
+        LOGE ("RIL_register: upgrade RIL to version 3 current version=%d", callbacks->version);
     }
 
     if (s_registerCalled > 0) {
