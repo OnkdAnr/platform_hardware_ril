@@ -24,7 +24,7 @@ function CtrlServer() {
     this.ctrlGetRadioState = function(req) {
         print('ctrlGetRadioState');
 
-        rsp = Object();
+        var rsp = new Object();
         rsp.state = gRadioState;
         result.responseProtobuf = ctrlSchema['ril_proto.CtrlRspRadioState'].serialize(rsp);
 
@@ -34,7 +34,7 @@ function CtrlServer() {
     this.ctrlSetRadioState = function(req) {
         print('ctrlSetRadioState');
 
-        radioReq = new Object();
+        var radioReq = new Object();
 
         // Parse the request protobuf to an object, the returned value is a
         // string that represents the variable name
@@ -43,13 +43,27 @@ function CtrlServer() {
         setRadioState(radioReq.state);
 
         // Prepare the response, return the current radio state
-        rsp = Object();
+        var rsp = new Object();
         rsp.state = gRadioState;
         result.responseProtobuf = ctrlSchema['ril_proto.CtrlRspRadioState'].serialize(rsp);
         print('gRadioState after setting: ' + gRadioState);
         return result;
     }
 
+    /**
+     * Generate an MT call
+     */
+    this.ctrlSetMTCall = function(req) {
+        print('ctrlSetMTCall');
+
+        var mtReq = new Object();
+
+        mtReq = ctrlSchema['ril_proto.CtrlReqSetMTCall'].parse(req.protobuf);
+        setMTCall(mtReq.phoneNumber, mtReq.name);
+
+        result.sendResponse = false;
+        return result;
+    }
 
     /**
      * Process the request
@@ -65,7 +79,7 @@ function CtrlServer() {
 
             // Default result will be success with no response protobuf
             try {
-                result = this.ctrlDispatchTable[req.cmd](req);
+                result = (this.ctrlDispatchTable[req.cmd]).call(this, req);
             } catch (err) {
                 print('ctrlServer: Unknown cmd=' + req.cmd);
                 result.ctrlStatus = 1; //ril_proto.CTRL_STATUS_ERR;
@@ -87,6 +101,7 @@ function CtrlServer() {
     this.ctrlDispatchTable = new Array();
     this.ctrlDispatchTable[CTRL_CMD_GET_RADIO_STATE] = this.ctrlGetRadioState;
     this.ctrlDispatchTable[CTRL_CMD_SET_RADIO_STATE] = this.ctrlSetRadioState;
+    this.ctrlDispatchTable[CTRL_CMD_SET_MT_CALL] = this.ctrlSetMTCall;
     print('CtrlServer() ctor X');
 }
 
@@ -102,15 +117,18 @@ ctrlWorker.run();
  */
 function onCtrlServerCmd(cmd, token, protobuf) {
     try {
-        //print('onCtrlServerCmd E cmd=' + cmd + ' token=' + token);
+        print('onCtrlServerCmd E cmd=' + cmd + ' token=' + token);
 
-        req = new Object();
+        var req = new Object();
         req.cmd = cmd;
         req.token = token;
         req.protobuf = protobuf;
+
+        print('onCtrlServerCmd add the request:');
+
         ctrlWorker.add(req);
 
-        //print('onCtrlServerCmd X cmd=' + cmd + ' token=' + token);
+        print('onCtrlServerCmd X cmd=' + cmd + ' token=' + token);
     } catch (err) {
         print('onCtrlServerCmd X Exception err=' + err);
     }

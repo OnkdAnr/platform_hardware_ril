@@ -53,6 +53,28 @@ function setRadioState(newState) {
 }
 
 /**
+ * Create an incoming call 
+ */
+function setMTCall(phoneNumber) {
+    print('createIncomingCall, number=' + phoneNumber + ' E');
+    
+    if (simulatedRadio.numberActiveCalls <= 0) {
+        // If there is no connection in use, the call state is INCOMING
+        state = CALLSTATE_INCOMING;
+    } else {
+        // If the incoming call is a second call, the state is WAITING
+        state = CALLSTATE_WAITING;
+    }
+    
+    // Add call to the call array
+    simulatedRadio.addCall(state, phoneNumber, '');
+    
+    // Send unsolicited response of call state change
+    simulatedRadioWorker.add(
+      {'reqNum' : CMD_UNSOL_CALL_STATE_CHANGED});
+}
+
+/**
  * Create a call.
  *
  * @return a RilCall
