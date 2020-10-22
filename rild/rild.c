@@ -52,14 +52,16 @@ extern void RIL_onRequestComplete(RIL_Token t, RIL_Errno e,
 extern void RIL_onUnsolicitedResponse(int unsolResponse, const void *data,
                                 size_t datalen);
 
-extern void RIL_requestTimedCallback (RIL_TimedCallback callback,
+extern void* RIL_requestTimedCallback (RIL_TimedCallback callback,
                                void *param, const struct timeval *relativeTime);
 
+extern void RIL_removeTimedCallback(void *callbackInfo);
 
 static struct RIL_Env s_rilEnv = {
     RIL_onRequestComplete,
     RIL_onUnsolicitedResponse,
-    RIL_requestTimedCallback
+    RIL_requestTimedCallback,
+    RIL_removeTimedCallback
 };
 
 extern void RIL_startEventLoop();
@@ -91,7 +93,7 @@ void switchUser() {
     struct __user_cap_data_struct cap;
     header.version = _LINUX_CAPABILITY_VERSION;
     header.pid = 0;
-    cap.effective = cap.permitted = 1 << CAP_NET_ADMIN;
+    cap.effective = cap.permitted = (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW);
     cap.inheritable = 0;
     capset(&header, &cap);
 }
