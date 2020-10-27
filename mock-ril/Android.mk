@@ -71,7 +71,7 @@ LOCAL_STRIP_MODULE := true
 LOCAL_PRELINK_MODULE := false
 LOCAL_LDLIBS += -lpthread
 LOCAL_CFLAGS += -DMOCK_RIL -D__BSD_VISIBLE
-LOCAL_MODULE_TAGS := debug
+LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libmock_ril
 
 include $(BUILD_SHARED_LIBRARY)
@@ -84,7 +84,6 @@ endif
 # =======================================================
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := debug
 LOCAL_MODULE := librilproto-java
 
 LOCAL_STATIC_JAVA_LIBRARIES := libprotobuf-java-2.3.0-micro
