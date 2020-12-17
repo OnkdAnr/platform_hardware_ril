@@ -126,7 +126,7 @@ namespace protobuf_v8 {
 
       Handle<Function> Constructor() const {
         DBG("Type::Constrocutor() EX:");
-        return Handle<Function>::Cast(handle_->GetInternalField(2));
+        return handle_->GetInternalField(2).As<Function>();
       }
 
       Local<Object> NewObject(Handle<Value> properties) const {
@@ -164,18 +164,18 @@ namespace protobuf_v8 {
         // managed type->schema link
         self->SetInternalField(1, schema_->handle_);
 
-        Handle<Function> constructor = Handle<Function>::Cast(
-          Script::Compile(String::New(from.str().c_str()))->Run());
+        Handle<Function> constructor =
+          Script::Compile(String::New(from.str().c_str()))->Run().As<Function>();
         constructor->SetHiddenValue(String::New("type"), self);
 
-        Handle<Function> bind = Handle<Function>::Cast(
+        Handle<Function> bind =
           Script::Compile(String::New(
               "(function(self) {"
               "  var f = this;"
               "  return function(arg) {"
               "    return f.call(self, arg);"
               "  };"
-              "})"))->Run());
+              "})"))->Run().As<Function>();
         Handle<Value> arg = self;
         constructor->Set(String::New("parse"), bind->Call(ParseTemplate->GetFunction(), 1, &arg));
         constructor->Set(String::New("serialize"), bind->Call(SerializeTemplate->GetFunction(), 1, &arg));
@@ -265,8 +265,7 @@ namespace protobuf_v8 {
             int size = reflection->FieldSize(instance, field);
             Handle<Array> array = Array::New(size);
             for (int j = 0; j < size; j++) {
-              Handle<Value> index = Number::New(i);
-              array->Set(index, ToJs(instance, reflection, field, child_type, j));
+              array->Set(j, ToJs(instance, reflection, field, child_type, j));
             }
             value = array;
           } else {
@@ -274,8 +273,7 @@ namespace protobuf_v8 {
           }
 
           DBG("Type::ToJs: set property[%d]=%s", i, ToCString(value));
-          Handle<Value> key = Number::New(i);
-          properties->Set(key, value);
+          properties->Set(i, value);
         }
 
         DBG("Type::ToJs(Message) X:");
@@ -317,7 +315,7 @@ namespace protobuf_v8 {
           ok = type->ToProto(repeated ?
                                 reflection->AddMessage(instance, field) :
                                 reflection->MutableMessage(instance, field),
-                                    Handle<Object>::Cast(value));
+                                    value.As<Object>());
           break;
         case FieldDescriptor::CPPTYPE_STRING: {
           DBG("Type::ToProto CPPTYPE_STRING");
@@ -402,11 +400,11 @@ namespace protobuf_v8 {
       bool ToProto(Message* instance, Handle<Object> src) const {
         DBG("ToProto(Message *, Handle<Object>) E:");
 
-        Handle<Function> to_array = Handle<Function>::Cast(handle_->GetInternalField(3));
-        Handle<Array> properties = Handle<Array>::Cast(to_array->Call(src, 0, NULL));
+        Handle<Function> to_array = handle_->GetInternalField(3).As<Function>();
+        Handle<Array> properties = to_array->Call(src, 0, NULL).As<Array>();
         bool ok = true;
         for (int i = 0; ok && (i < descriptor_->field_count()); i++) {
-          Handle<Value> value = properties->Get(Number::New(i));
+          Handle<Value> value = properties->Get(i);
           if (value->IsUndefined()) continue;
 
           const FieldDescriptor* field = descriptor_->field(i);
@@ -417,10 +415,10 @@ namespace protobuf_v8 {
             if(!value->IsArray()) {
               ok = ToProto(instance, field, value, child_type, true);
             } else {
-              Handle<Array> array = Handle<Array>::Cast(value);
+              Handle<Array> array = value.As<Array>();
               int length = array->Length();
               for (int j = 0; ok && (j < length); j++) {
-                ok = ToProto(instance, field, array->Get(Number::New(j)), child_type, true);
+                ok = ToProto(instance, field, array->Get(j), child_type, true);
               }
             }
           } else {
@@ -441,7 +439,7 @@ namespace protobuf_v8 {
 
         Type* type = UnwrapThis<Type>(args);
         Message* message = type->NewMessage();
-        if (type->ToProto(message, Handle<Object>::Cast(args[0]))) {
+        if (type->ToProto(message, args[0].As<Object>())) {
           int length = message->ByteSize();
           Buffer* buffer = Buffer::New(length);
           message->SerializeWithCachedSizesToArray((google::protobuf::uint8*)buffer->data());
@@ -474,9 +472,8 @@ namespace protobuf_v8 {
         new Type(this, descriptor, TypeTemplate->GetFunction()->NewInstance());
 
       // managed schema->[type] link
-      Handle<Array> types = Handle<Array>::Cast(handle_->GetInternalField(1));
-      Handle<Value> key = Number::New(types->Length());
-      types->Set(key, result->handle_);
+      Handle<Array> types = handle_->GetInternalField(1).As<Array>();
+      types->Set(types->Length(), result->handle_);
       DBG("Schema::GetType(descriptor) X:");
       return result;
     }
