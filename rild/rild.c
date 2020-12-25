@@ -91,7 +91,7 @@ void switchUser() {
     struct __user_cap_data_struct cap;
     header.version = _LINUX_CAPABILITY_VERSION;
     header.pid = 0;
-    cap.effective = cap.permitted = (1 << CAP_NET_ADMIN) | (1 << CAP_NET_RAW);
+    cap.effective = cap.permitted = 1 << CAP_NET_ADMIN;
     cap.inheritable = 0;
     capset(&header, &cap);
 }
@@ -108,6 +108,7 @@ int main(int argc, char **argv)
 
     int i;
 
+    umask(S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IWOTH | S_IXOTH);
     for (i = 1; i < argc ;) {
         if (0 == strcmp(argv[i], "-l") && (argc - i > 1)) {
             rilLibPath = argv[i + 1];
