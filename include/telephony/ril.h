@@ -160,8 +160,8 @@ typedef struct {
     char *          type;       /* One of the PDP_type values in TS 27.007 section 10.1.1.
                                    For example, "IP", "IPV6", "IPV4V6", or "PPP". */
     char *          apn;
-    char *          address;    /* The IPv4 or IPv6 address assigned to the call, e.g., "192.0.1.3"
-                                   or "2001:db8::1". */
+    char *          address;    /* A space-delimited list of addresses, e.g., "192.0.1.3" or
+                                   "192.0.1.11 2001:db8::1". */
 } RIL_Data_Call_Response;
 
 typedef struct {
@@ -3294,9 +3294,13 @@ typedef struct {
  *
  * Called when new Broadcast SMS is received
  *
- * "data" is const char * of 88 bytes which indicates each page
- * of a CBS Message sent to the MS by the BTS as coded in 3GPP
- * 23.041 Section 9.4.1.1
+ * "data" can be one of the following:
+ * If received from GSM network, "data" is const char of 88 bytes
+ * which indicates each page of a CBS Message sent to the MS by the
+ * BTS as coded in 3GPP 23.041 Section 9.4.1.2.
+ * If received from UMTS network, "data" is const char of 90 up to 1252
+ * bytes which contain between 1 and 15 CBS Message pages sent as one
+ * packet to the MS by the BTS as coded in 3GPP 23.041 Section 9.4.2.2.
  *
  */
 #define RIL_UNSOL_RESPONSE_NEW_BROADCAST_SMS 1021
