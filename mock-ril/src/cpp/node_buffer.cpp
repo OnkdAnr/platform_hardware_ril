@@ -187,8 +187,10 @@ Handle<Value> Buffer::New(const Arguments &args) {
     Local<Array> a = Local<Array>::Cast(args[0]);
     buffer = new Buffer(a->Length());
     char *p = buffer->data();
-    for (unsigned int i = 0; i < a->Length(); i++) {
-      p[i] = a->Get(i)->Uint32Value();
+    for (int i = 0; i < a->Length(); i++) {
+      Handle<Value> index = v8::Number::New(i);
+      p[i] = a->Get(index)->Uint32Value();
+      //p[i] = a->Get(i)->Uint32Value();
     }
   } else if (args[0]->IsString()) {
     Local<String> s = args[0]->ToString();
@@ -441,12 +443,12 @@ Handle<Value> Buffer::Utf8Write(const Arguments &args) {
   int char_written;
 
   int written = s->WriteUtf8((char*)p,
-                             buffer->length_ - offset,
-                             &char_written,
-                             String::HINT_MANY_WRITES_EXPECTED);
+                             buffer->length_ - offset);
+//                             &char_written,
+//                             String::HINT_MANY_WRITES_EXPECTED);
 
   constructor_template->GetFunction()->Set(chars_written_sym,
-                                           Integer::New(char_written));
+                                           Integer::New(written));
 
   if (written > 0 && p[written-1] == '\0') written--;
 
@@ -482,7 +484,7 @@ Handle<Value> Buffer::AsciiWrite(const Arguments &args) {
 
   size_t towrite = MIN((unsigned long) s->Length(), buffer->length_ - offset);
 
-  int written = s->WriteAscii((char*)p, 0, towrite, String::HINT_MANY_WRITES_EXPECTED);
+  int written = s->WriteAscii((char*)p, 0, towrite);
   DBG("Buffer::AsciiWrite(args) X");
   return scope.Close(Integer::New(written));
 }
