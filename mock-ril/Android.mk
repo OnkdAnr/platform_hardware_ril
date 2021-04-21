@@ -51,9 +51,10 @@ LOCAL_SHARED_LIBRARIES += libstlport
 LOCAL_C_INCLUDES += external/stlport/stlport
 endif
 
+# build shared library but don't require it be prelinked
 # __BSD_VISIBLE for htolexx macros.
 LOCAL_STRIP_MODULE := true
-
+LOCAL_PRELINK_MODULE := false
 LOCAL_LDLIBS += -lpthread
 LOCAL_CFLAGS += -DMOCK_RIL -D__BSD_VISIBLE
 LOCAL_PROTOC_OPTIMIZE_TYPE := full
@@ -78,9 +79,3 @@ LOCAL_SRC_FILES := $(call all-java-files-under, $(src_java)) \
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
 # =======================================================
-
-src_cpp :=
-src_java :=
-src_py :=
-src_js :=
-src_proto :=
