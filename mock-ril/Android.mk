@@ -79,3 +79,9 @@ LOCAL_SRC_FILES := $(call all-java-files-under, $(src_java)) \
 
 include $(BUILD_STATIC_JAVA_LIBRARY)
 # =======================================================
+
+src_cpp :=
+src_java :=
+src_py :=
+src_js :=
+src_proto :=
