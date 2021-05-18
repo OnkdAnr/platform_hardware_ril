@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <telephony/ril.h>
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -30,9 +31,8 @@
 #include <termios.h>
 
 #include <v8.h>
-#include "ril.h"
 
-#include "hardware/ril/mock-ril/src/proto/ril.pb.h"
+#include "ril.pb.h"
 
 #include "ctrl_server.h"
 #include "logging.h"
