@@ -15,14 +15,14 @@
  */
 
 #include <v8.h>
-#include <telephony/ril.h>
+#include "ril.h"
 
 #include "logging.h"
 #include "status.h"
 #include "worker.h"
 #include "util.h"
 
-#include "ril.pb.h"
+#include "hardware/ril/mock-ril/src/proto/ril.pb.h"
 
 #include "logging.h"
 #include "js_support.h"
